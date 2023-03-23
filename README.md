@@ -1,7 +1,7 @@
 # InteractiveFilter
 Add a new interactive filter for KSP2 OAB to filter parts dynamically.
 
-![20230323143135_1](https://user-images.githubusercontent.com/127409491/227220648-16482924-db13-4a8d-90ee-1b4ab62bce73.jpg)
+![gif](https://github.com/VChristof/InteractiveFilter/blob/main/Animation.gif)
 
 This mod adds two new buttons:
 - Top filter (Can be switched by key "T" also)
