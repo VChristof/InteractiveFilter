@@ -12,7 +12,7 @@ public class InteractiveFilterLoader : BaseSpaceWarpPlugin
 {
     public const string ModGuid = "com.vchristof.interactive_filter";
     public const string ModName = "interactive_filter";
-    public const string ModVer = "0.1";
+    public const string ModVer = "0.2";
     public static InteractiveFilterLoader Instance { get; set; }
 
     protected Dictionary<string,ConfigEntry<bool>> configUseMod = new();
