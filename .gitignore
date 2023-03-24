@@ -31,6 +31,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+interactive_filter/
+interactive_filter.zip
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

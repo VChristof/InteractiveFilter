@@ -13,7 +13,6 @@ namespace UITweeks.UITweeks
         private static bool bottomFilterOn = false;
         private static bool topFilterOn = false;
 
-        private bool partEventsRegisted = false;
         private static IObjectAssembly mainAssembly;
         private static readonly List<AssemblySizeFilterType> sizes = new();
         private static int partCount = -1;
@@ -68,7 +67,6 @@ namespace UITweeks.UITweeks
             {"pod_3v_conical_crew", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.S, NODE_POSITION.TOP) },
             {"cockpit_3v_m3_crew", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.S, NODE_POSITION.TOP) },
 
-
             {"resizer_1v_square_1v-0v", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.XS, NODE_POSITION.TOP) },
 
             {"resizer_2v_circular_2v-1v", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.S, NODE_POSITION.TOP) },
@@ -81,48 +79,59 @@ namespace UITweeks.UITweeks
             {"resizer_4v_square_4v-2v", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.M, NODE_POSITION.TOP) },
 
             {"resizer_4v_circular_4v-3v", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.L, NODE_POSITION.TOP) },
-            {"resizer_4v_square_4v-3v", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.L, NODE_POSITION.TOP) }
+            {"resizer_4v_square_4v-3v", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.L, NODE_POSITION.TOP) },
 
+            {"adapter_2v_2point_1v-2v", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.S, NODE_POSITION.BOTTOM) },
+            {"adapter_2v_3point_1v-2v", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.S, NODE_POSITION.BOTTOM) },
+            {"adapter_2v_4point_1v-2v", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.S, NODE_POSITION.BOTTOM) },
+
+            {"adapter_2v_m2_2point_methalox_1v-m2", new AssemblySizeFilterTypeToPosition(AssemblySizeFilterType.S, NODE_POSITION.BOTTOM) }
         };
         void Update()
         {
-            if (IsOABLoaded())
+            try
             {
-                if (registerTimer <= 0)
+                if (IsOABLoaded())
                 {
-                    RegisterForEvents();
-                }
-                else
-                {
-                    registerTimer -= Time.unscaledDeltaTime;
-                }
-                if (Input.GetKeyDown(KeyCode.B))
-                {
-                    bottomFilterOn = !bottomFilterOn;
-                    if (bottomToggle != null)
+                    if (registerTimer <= 0)
                     {
-                        bottomToggle.isOn = bottomFilterOn;
+                        RegisterForEvents();
                     }
-                    RefreshSizes();
-                    RefreshUIButtons();
-
-                }
-                if (Input.GetKeyDown(KeyCode.T))
-                {
-                    topFilterOn = !topFilterOn;
-                    if (topToggle != null)
+                    else
                     {
-                        topToggle.isOn = topFilterOn;
+                        registerTimer -= Time.unscaledDeltaTime;
                     }
-                    RefreshSizes();
-                    RefreshUIButtons();
+                    if (Input.GetKeyDown(KeyCode.B))
+                    {
+                        bottomFilterOn = !bottomFilterOn;
+                        if (bottomToggle != null)
+                        {
+                            bottomToggle.isOn = bottomFilterOn;
+                        }
+                        RefreshSizes();
+                        RefreshUIButtons();
 
-                }
+                    }
+                    if (Input.GetKeyDown(KeyCode.T))
+                    {
+                        topFilterOn = !topFilterOn;
+                        if (topToggle != null)
+                        {
+                            topToggle.isOn = topFilterOn;
+                        }
+                        RefreshSizes();
+                        RefreshUIButtons();
 
-                if (mainAssembly != null && mainAssembly.Parts.Count != partCount)
-                {
-                    RefreshSizes();
+                    }
+
+                    if (mainAssembly != null && mainAssembly.Parts.Count != partCount)
+                    {
+                        RefreshSizes();
+                    }
                 }
+            } catch(Exception e)
+            {
+                Debug.LogException(e);
             }
         }
 
@@ -144,11 +153,41 @@ namespace UITweeks.UITweeks
                     GUIUtility.GetControlID(FocusType.Passive),
                 windowRect,
                     FillWindow,
-                     "<color=#696DFF>//Interactive Filter</color>",
+                     "<color=#696DFF>//Interactive Filter Debug</color>",
                     GUILayout.Height(0),
                     GUILayout.Width(300));
             }
         }
+
+        private void FillWindow(int windowID)
+        {
+            GUILayout.BeginVertical();
+            topFilterOn = GUILayout.Toggle(topFilterOn, "Top");
+            bottomFilterOn = GUILayout.Toggle(bottomFilterOn, "Bottom");
+            GUILayout.EndHorizontal();
+
+            if (mainAssembly != null)
+            {
+                if (mainAssembly.Anchor != null)
+                {
+                    GUILayout.Label("mainAssembly: " + mainAssembly.Anchor.Name);
+                }
+                else
+                {
+                    GUILayout.Label("mainAssembly.Anchor is null");
+                }
+            }
+            else
+            {
+                GUILayout.Label("mainAssembly is null");
+            }
+
+            if (GUI.changed)
+            {
+                RefreshSizes();
+            }
+        }
+
 
         public void ToggleTop(bool value)
         {
@@ -173,48 +212,26 @@ namespace UITweeks.UITweeks
         {
             this.bottomToggle = bottomToggle;
         }
-
-        private void FillWindow(int windowID)
-        {
-            GUILayout.BeginVertical();
-            topFilterOn = GUILayout.Toggle(topFilterOn, "Top");
-            bottomFilterOn = GUILayout.Toggle(bottomFilterOn, "Bottom");
-            GUILayout.EndHorizontal();
-
-            if (mainAssembly != null) {
-                if (mainAssembly.Anchor != null)
-                {
-                    GUILayout.Label("mainAssembly: " + mainAssembly.Anchor.Name);
-                }
-                else
-                {
-                    GUILayout.Label("mainAssembly.Anchor is null");
-                }
-            }
-            else
-            {
-                GUILayout.Label("mainAssembly is null");
-            }
-
-            if(GUI.changed)
-            {
-                RefreshSizes();
-            }
-        }
-
         private static void RefreshSizes()
         {
-            sizes.Clear();
-            partCount = 0;
-            if (mainAssembly != null)
+            try
             {
-                foreach (IObjectAssemblyPart oap in mainAssembly.Parts)
+                sizes.Clear();
+                partCount = 0;
+                if (mainAssembly != null)
                 {
-                    CheckSize(oap);
+                    foreach (IObjectAssemblyPart oap in mainAssembly.Parts)
+                    {
+                        CheckSize(oap);
+                    }
+                    partCount = mainAssembly.Parts.Count;
                 }
-                partCount = mainAssembly.Parts.Count;
+                RefreshUIButtons();
             }
-            RefreshUIButtons();
+            catch (Exception e)
+            {
+                Debug.LogError(e.Message);
+            }
         }
 
         private static void CheckSize(IObjectAssemblyPart oap)
@@ -248,14 +265,21 @@ namespace UITweeks.UITweeks
 
         private static void CheckToEnableButton(AssemblyPartsButton assemblyPartsButton)
         {
-            if (sizes.Count > 0 && (bottomFilterOn || topFilterOn))
+            try
             {
-                bool shouldBeActive = sizes.Contains(assemblyPartsButton.part.Size) || IsOverridenContains(assemblyPartsButton.part, sizes);
-                assemblyPartsButton.gameObject.SetActive(shouldBeActive);
+                if (sizes.Count > 0 && (bottomFilterOn || topFilterOn))
+                {
+                    bool shouldBeActive = sizes.Contains(assemblyPartsButton.part.Size) || IsOverridenContains(assemblyPartsButton.part, sizes);
+                    assemblyPartsButton.gameObject.SetActive(shouldBeActive);
+                }
+                else
+                {
+                    assemblyPartsButton.gameObject.SetActive(true);
+                }
             }
-            else
+            catch (Exception e)
             {
-                assemblyPartsButton.gameObject.SetActive(true);
+                Debug.LogError(e.Message);
             }
         }
         public static void MyAddButton(AssemblyPartsButton assemblyPartsButton)
@@ -318,12 +342,12 @@ namespace UITweeks.UITweeks
             RefreshSizes();
         }
 
-        static AssemblySizeFilterType GetSize(string nodePosition, IObjectAssemblyPart oap)
+        static AssemblySizeFilterType GetSize(string nodeTag, IObjectAssemblyPart oap)
         {
             if (CATEGORY_OVERRIDE.ContainsKey(oap.Name))
             {
                 AssemblySizeFilterTypeToPosition assemblySizeFilterTypeToPosition = CATEGORY_OVERRIDE[oap.Name];
-                if (assemblySizeFilterTypeToPosition.position.ToString().ToLower().Equals(nodePosition.ToLower()))
+                if (nodeTag.ToLower().Contains(assemblySizeFilterTypeToPosition.position.ToString().ToLower()))
                 {
                     return assemblySizeFilterTypeToPosition.size;
                 }
@@ -369,7 +393,13 @@ namespace UITweeks.UITweeks
             [HarmonyPostfix]
             static void AddButton(ref GameObject btn)
             {
-                MyAddButton(btn.GetComponent<AssemblyPartsButton>());
+                try
+                {
+                    MyAddButton(btn.GetComponent<AssemblyPartsButton>());
+                } catch(Exception e)
+                {
+                    Debug.LogError(e.Message);
+                }
             }
         }
     }
