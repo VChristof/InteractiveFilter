@@ -20,3 +20,7 @@ Only the launch vehicle is considered in the filltering.
 If both filter is active attachment node orientation is note checked only if its free. (every node's size is considered)
 
 If there are no free nodes no filtering will be applied.
+
+# Installation Instructions
+1. Install Space Warp (https://github.com/SpaceWarpDev/SpaceWarp) mod loader and run the game, then close it.
+2. Place interactive_filter folder in the directory under your game install at Kerbal Space Program 2\BepInEx\plugins.
